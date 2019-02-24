@@ -16,7 +16,6 @@ class Office365SyncPipeline < ActiveRecord::Base
     users_for_sync = []
     case self.entry.class.name
     when "EasyContact"
-      binding.pry
       self.entry.projects.each do |project|
         users_for_sync << project.users.select {|u| u.office365_projects_enabled.include?(project) }
       end
