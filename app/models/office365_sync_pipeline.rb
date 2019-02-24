@@ -1,5 +1,7 @@
 class Office365SyncPipeline < ActiveRecord::Base
 
+  scope :unsynced, -> { where(synced_at: nil) }
+
   serialize :synced_for_user_ids, Array
   serialize :sync_failed_for_user_ids, Array
 
