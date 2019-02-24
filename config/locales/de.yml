@@ -1,0 +1,10 @@
+de:
+  label_office365_status: Office365 API Status
+  office365:
+    buttons:
+      reload_user_id: Zugriffstoken neu laden
+      get_user_id: Zugriffstoken anfordern
+    labels:
+      no_user_id: kein Zugriffstoken vorhanden
+      projects_enabled: Synchronisierung für folgende Projekte aktivieren
+

@@ -1,0 +1,9 @@
+# Client ID and client secret for the Office365 Auth API
+client_id: your-client-id
+client_secret: your-client-secrect
+
+
+# add the URL for your web server here (incl. protocal and port)
+# this is where the Office365 auth process will redirect the user after sign in
+# please omit the trailing '/'
+redirect_host: http://localhost:3000

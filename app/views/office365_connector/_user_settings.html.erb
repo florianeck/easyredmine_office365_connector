@@ -1,0 +1,15 @@
+  <fieldset class="box tabular">
+    <legend><%=l(:label_office365_status)%></legend>
+
+    <% if @user.office365_active? %>
+      <p><b><%= l("office365.labels.projects_enabled") %></b></p>
+      <%= fields_for @user do |f| %>
+        <%= f.select :office365_project_id_settings, @user.projects.map {|p| [p.name, p.id] } %>
+      <% end %>
+      <p><%= link_to l("office365.buttons.reload_user_id"), o365_auth_path(from: request.url) %></p>
+      <p><%= link_to "Abmelden", o365_unauth_path %></p>
+    <% else %>
+      <p><b><%= l("office365.labels.no_user_id") %></b></p>
+      <p><%= link_to l("office365.buttons.get_user_id"), o365_auth_path(from: request.url) %></p>
+    <% end %>
+  </fieldset>
