@@ -8,56 +8,37 @@ class O365Contact
 
   def to_json
     {
-      "DisplayName" => "Pavel Bansky",
-      "GivenName" => "Pavel",
-      "Surname" => "Bansky",
-      "Title" => null,
-      "EmailAddresses" => [],
-      "JobTitle" => null,
-      "CompanyName" => null,
-      "Department" => null,
-      "OfficeLocation" => null,
-      "Profession" => null,
-      "BusinessHomePage" => null,
-      "AssistantName" => null,
-      "Manager" => null,
-      "HomePhones" => [
-        null,
-        null
-      ],
-      "BusinessPhones" => [
-        "+1 732 555 0102",
-        null
-      ],
-      "MobilePhone1" => null,
-      "HomeAddress" => {
-        "Street" => null,
-        "City" => null,
-        "State" => null,
-        "CountryOrRegion" => null,
-        "PostalCode" => null
-      },
+      "DisplayName"   => easy_contact.name,
+      "GivenName"     => easy_contact.person? ? easy_contact.firstname : nil,
+      "Surname"       => easy_contact.person? ? easy_contact.lastname : nil,
+      "Title" => nil, # => TODO: GET from custom fields
+      "EmailAddresses" => [easy_contact.email],
+      "JobTitle" => nil, # => TODO: GET from custom fields
+      "CompanyName" => easy_contact.person? ? parent_company.try(:name) : easy_contact.name,
+      #"Department" => null,
+      #"OfficeLocation" => null,
+      #"Profession" => null,
+      #"BusinessHomePage" => null,
+      #"Manager" => null,
+      "BusinessPhones" => [easy_contact.custom_field_value(EasyContacts::CustomFields.telephone_id)],
+      "MobilePhone1" => nil, # => TODO: GET from custom fields
       "BusinessAddress" => {
-        "Street" => null,
-        "City" => null,
-        "State" => null,
-        "CountryOrRegion" => null,
-        "PostalCode" => null
+        "Street" => easy_contact.street,
+        "City" => easy_contact.city,
+        "State" => easy_contact.state,
+        "CountryOrRegion" => nil,
+        "PostalCode" => nil
       },
-      "OtherAddress" => {
-        "Street" => null,
-        "City" => null,
-        "State" => null,
-        "CountryOrRegion" => null,
-        "PostalCode" => null
-      },
-      "PersonalNotes" => null,
-      "Children" => [],
+      "PersonalNotes" => easy_contact.projects.map(&:name).join(" / "),
     }
   end
 
-  def parent_company
-    if
+  def parent_company_name
+    if easy_contact.person? && easy_contact.parent.company?
+      easy_contact.parent
+    elsif easy_contact.person?
+      easy_contact.custom_field_value(EasyContacts::CustomFields.organization_id)
+    end
   end
 
 end
