@@ -13,7 +13,7 @@ module EasyredmineOffice365Connector
     end
 
     def office365_projects_enabled
-      self.projects.where(id: office365_project_ids_enabled)
+      office365_active? ? self.projects.where(id: office365_project_ids_enabled) : []
     end
 
     def o365_api

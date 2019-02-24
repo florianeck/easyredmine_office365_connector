@@ -6,6 +6,7 @@ class CreateO365SyncPipeline < ActiveRecord::Migration
       t.string :entry_id
       t.datetime :synced_at
       t.text :synced_for_user_ids
+      t.text :sync_failed_for_user_ids
       t.timestamps
     end
 
