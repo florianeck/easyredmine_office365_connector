@@ -79,43 +79,37 @@ module EasyredmineOfficeConnector
       end
     end
 
-    ##== Authorization
-    #
-    #def authorization_userinfo
-    #  get("/authorization/userinfo")
-    #end
-    #
-    ##== devices
-    #def devices_for_user(userid)
-    #  get "/#{userid}/devices"
-    #end
-    #
-    ##== history
-    #def history_for_user(userid, params = {})
-    #  get "/#{userid}/history", params
-    #end
-    #
-    #def history_delete(userId, entryId)
-    #  delete "/#{userId}/history/#{entryId}"
-    #end
-    #
-    ##== numbers
-    #def numbers_for_user(userid)
-    #  get("/#{userid}/numbers")
-    #end
-    #
-    ##== sessions
-    #def calls(deviceid, callee)
-    #  post("/sessions/calls", {
-    #    "caller": deviceid,
-    #    "callee": callee
-    #  })
-    #end
-    #
-    ##== Users
-    #def users
-    #  get("/users")
-    #end
+    def create_or_update_contact(easy_contact)
+      if @user.office365_contact_folder_id.nil?
+        create_root_folder
+        @user.reload
+      end
+
+      # decide wether to update or create
+      settings = if easy_contact.o365_id_for_user(@user).nil? # => create
+        { url: "/me/contactFolders/#{@user.office365_contact_folder_id}/contacts" , method: :post }
+      else
+        { url: "/me/contactFolders/#{@user.office365_contact_folder_id}/contacts/#{easy_contact.o365_id_for_user(@user)}" , method: :patch }
+      end
+
+      self.send(settings[:method], settings[:url], easy_contact.to_o365_hash) do |response|
+        if settings[:method] == :post # => create
+          begin
+            easy_contact.set_o365_id_for_user(@user, JSON.parse(response.body)['id'])
+          rescue Exception => e
+            # TODO: Add Custom Error Logger for Office
+            binding.pry
+          end
+        else
+          if response.inspect.include?('201')
+            # worked
+          else
+            binding.pry
+          end
+        end
+      end
+    end
+
 
     private
 
@@ -125,6 +119,12 @@ module EasyredmineOfficeConnector
 
     def post(path, params)
       RestClient.post(url(path), params.to_json, headers) do |response|
+        yield(response)
+      end
+    end
+
+    def patch(path, params)
+      RestClient.patch(url(path), params.to_json, headers) do |response|
         yield(response)
       end
     end
