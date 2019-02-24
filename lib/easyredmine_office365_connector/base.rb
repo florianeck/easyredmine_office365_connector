@@ -55,51 +55,67 @@ module EasyredmineOfficeConnector
   class Api
     require "rest-client"
 
-    BASE_URL = "https://api.sipgate.com/v1"
+    BASE_URL = "https://graph.microsoft.com/v1.0"
 
-    attr_reader :access_token
+    attr_reader :access_token, :user
 
-    def initialize(access_token)
+    def initialize(access_token, user)
       @access_token = access_token
+      @user = user
     end
 
-    #== Authorization
-
-    def authorization_userinfo
-      get("/authorization/userinfo")
+    def create_root_folder
+      post("/me/contactfolders", { "displayName": EasyredmineOfficeConnector.contact_folder_name }) do |response|
+        begin
+          if JSON.parse(response.body)['id']
+            @user.update_column(
+              :office365_contact_folder_id, JSON.parse(response.body)['id']
+            )
+          end
+        rescue Exception => e
+          # TODO: Add Custom Error Logger for Office
+          binding.pry
+        end
+      end
     end
 
-    #== devices
-    def devices_for_user(userid)
-      get "/#{userid}/devices"
-    end
-
-    #== history
-    def history_for_user(userid, params = {})
-      get "/#{userid}/history", params
-    end
-
-    def history_delete(userId, entryId)
-      delete "/#{userId}/history/#{entryId}"
-    end
-
-    #== numbers
-    def numbers_for_user(userid)
-      get("/#{userid}/numbers")
-    end
-
-    #== sessions
-    def calls(deviceid, callee)
-      post("/sessions/calls", {
-        "caller": deviceid,
-        "callee": callee
-      })
-    end
-
-    #== Users
-    def users
-      get("/users")
-    end
+    ##== Authorization
+    #
+    #def authorization_userinfo
+    #  get("/authorization/userinfo")
+    #end
+    #
+    ##== devices
+    #def devices_for_user(userid)
+    #  get "/#{userid}/devices"
+    #end
+    #
+    ##== history
+    #def history_for_user(userid, params = {})
+    #  get "/#{userid}/history", params
+    #end
+    #
+    #def history_delete(userId, entryId)
+    #  delete "/#{userId}/history/#{entryId}"
+    #end
+    #
+    ##== numbers
+    #def numbers_for_user(userid)
+    #  get("/#{userid}/numbers")
+    #end
+    #
+    ##== sessions
+    #def calls(deviceid, callee)
+    #  post("/sessions/calls", {
+    #    "caller": deviceid,
+    #    "callee": callee
+    #  })
+    #end
+    #
+    ##== Users
+    #def users
+    #  get("/users")
+    #end
 
     private
 
@@ -109,7 +125,7 @@ module EasyredmineOfficeConnector
 
     def post(path, params)
       RestClient.post(url(path), params.to_json, headers) do |response|
-        response
+        yield(response)
       end
     end
 

@@ -26,6 +26,10 @@ module EasyredmineOfficeConnector
       config_from_yaml['client_secret']
     end
 
+    def contact_folder_name
+      config_from_yaml['contact_folder_name']
+    end
+
     def redirect_url
       Rails.application.routes.url_helpers.o365_callback_url(host: config_from_yaml['redirect_host'])
     end
