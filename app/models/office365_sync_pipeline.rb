@@ -1,5 +1,7 @@
 class Office365SyncPipeline < ActiveRecord::Base
 
+  scope :unsynced, -> { where(synced_at: nil) }
+
   serialize :synced_for_user_ids, Array
   serialize :sync_failed_for_user_ids, Array
 
@@ -16,7 +18,6 @@ class Office365SyncPipeline < ActiveRecord::Base
     users_for_sync = []
     case self.entry.class.name
     when "EasyContact"
-      binding.pry
       self.entry.projects.each do |project|
         users_for_sync << project.users.select {|u| u.office365_projects_enabled.include?(project) }
       end
