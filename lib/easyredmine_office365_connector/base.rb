@@ -93,6 +93,7 @@ module EasyredmineOfficeConnector
       end
 
       self.send(settings[:method], settings[:url], easy_contact.to_o365_hash) do |response|
+        puts response.body
         if settings[:method] == :post # => create
           begin
             if JSON.parse(response.body)['id']
