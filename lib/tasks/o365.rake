@@ -7,4 +7,11 @@ namespace :o365 do
     end
   end
 
+  desc "refresh all tokens for users with refresh token"
+  task :refresh_tokens do
+    User.where.not(office365_refresh_token: nil).each do |user|
+      user.o365_api.refresh_token!
+    end
+  end
+
 end
