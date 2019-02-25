@@ -10,8 +10,8 @@ class CreateO365SyncPipeline < ActiveRecord::Migration
       t.timestamps
     end
 
-    add_index :office365_sync_pipeline, :entry_type
-    add_index :office365_sync_pipeline, :entry_id
+    #add_index :office365_sync_pipeline, :entry_type
+    #add_index :office365_sync_pipeline, :entry_id
 
     create_table :office365_easy_contacts_user_mappings, :force => true do |t|
       t.integer :user_id
@@ -19,8 +19,10 @@ class CreateO365SyncPipeline < ActiveRecord::Migration
       t.string :office365_contact_id
     end
 
-    add_index :office365_easy_contacts_user_mappings, :user_id
-    add_index :office365_easy_contacts_user_mappings, :easy_contact_id
+    #add_index :office365_easy_contacts_user_mappings, :user_id
+    #add_index :office365_easy_contacts_user_mappings, :easy_contact_id
+
+    # TODO: Fix 'Mysql2::Error: Index column size too large. The maximum column size is 767 bytes' on production machine and add index afterwards
   end
 
 end
