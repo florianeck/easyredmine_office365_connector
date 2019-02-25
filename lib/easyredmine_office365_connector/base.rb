@@ -95,14 +95,19 @@ module EasyredmineOfficeConnector
       self.send(settings[:method], settings[:url], easy_contact.to_o365_hash) do |response|
         if settings[:method] == :post # => create
           begin
-            easy_contact.set_o365_id_for_user(@user, JSON.parse(response.body)['id'])
+            if JSON.parse(response.body)['id']
+              easy_contact.set_o365_id_for_user(@user, JSON.parse(response.body)['id'])
+              return true
+            else
+              return false
+            end
           rescue Exception => e
             # TODO: Add Custom Error Logger for Office
             binding.pry
           end
         else
-          if response.inspect.include?('201')
-            # worked
+          if response.inspect.include?('200')
+            return true
           else
             binding.pry
           end

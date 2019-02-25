@@ -38,6 +38,7 @@ module EasyredmineOfficeConnector
 end
 
 require "easyredmine_office365_connector/base"
+require "easyredmine_office365_connector/office365_sync_service"
 require "easyredmine_office365_connector/hooks"
 require "easyredmine_office365_connector/user_extension"
 require "easyredmine_office365_connector/easy_contact_extension"

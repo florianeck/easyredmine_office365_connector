@@ -25,11 +25,7 @@ module EasyredmineOfficeConnector
           @pipeline_entry.sync_failed_for_user_ids << user.id
         end
       end
-
-      if @pipeline_entry.sync_failed_for_user_ids.empty?
-        @pipeline_entry.synced_at = Time.now
-      end
-
+      @pipeline_entry.synced_at = Time.now
       @pipeline_entry.save
     end
 
