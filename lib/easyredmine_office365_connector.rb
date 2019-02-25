@@ -15,7 +15,7 @@ module EasyredmineOfficeConnector
     end
 
     def scope
-      'Contacts.ReadWrite'
+      'Contacts.ReadWrite offline_access'
     end
 
     def client_id

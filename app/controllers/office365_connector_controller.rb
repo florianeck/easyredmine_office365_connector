@@ -18,8 +18,11 @@ class Office365ConnectorController < ApplicationController
       if response_for_token.code == '200'
         data = JSON.parse(response_for_token.body)
         user = User.current
-        user.update_attributes(office365_oauth_token: data['access_token'])
-        user.save
+        binding.pry
+        user.update_attributes(
+          office365_oauth_token: data['access_token'],
+          office365_refresh_token: data['refresh_token']
+        )
       else
         flash[:error] = "Office365 Auth Failed"
       end

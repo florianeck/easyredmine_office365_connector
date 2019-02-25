@@ -6,7 +6,7 @@ module EasyredmineOfficeConnector
 
     attr_reader :client_id, :client_secret, :scope, :redirect_url
 
-    def initialize(client_id, client_secret, redirect_url = "http://localhost:3000/o365/callback", scope = 'all')
+    def initialize(client_id = EasyredmineOfficeConnector.client_id, client_secret = EasyredmineOfficeConnector.client_secret, redirect_url = EasyredmineOfficeConnector.redirect_url, scope = EasyredmineOfficeConnector.scope)
       @client_id       = client_id
       @client_secret   = client_secret
       @scope        = scope
@@ -32,20 +32,20 @@ module EasyredmineOfficeConnector
 
     # Access Token Part
 
-    def token_request_params(code)
+    def token_request_params(code, grant_type = 'authorization_code')
       {
         client_id: @client_id,
         client_secret: @client_secret,
         redirect_uri: @redirect_url,
-        code: code,
-        grant_type: 'authorization_code'
+        (grant_type == 'authorization_code' ? 'code' : 'refresh_token') => code,
+        grant_type: grant_type
       }
     end
 
-    def post_token_request(code)
+    def post_token_request(code, grant_type = 'authorization_code')
       response = Net::HTTP.post_form(
         URI(TOKEN_URL),
-        token_request_params(code).stringify_keys
+        token_request_params(code, grant_type).stringify_keys
       )
       return response
     end
@@ -62,6 +62,15 @@ module EasyredmineOfficeConnector
     def initialize(access_token, user)
       @access_token = access_token
       @user = user
+    end
+
+    def refresh_token!
+      response = EasyredmineOfficeConnector::Auth.new.post_token_request(user.office365_refresh_token, 'refresh_token')
+      data = JSON.parse(response.body)
+      @user.update_attributes(
+        office365_oauth_token: data['access_token'],
+        office365_refresh_token: data['refresh_token']
+      )
     end
 
     def create_or_update_contact(easy_contact)
@@ -94,6 +103,8 @@ module EasyredmineOfficeConnector
           end
         end
       end
+
+      @user.refresh_token!
     end
 
 
