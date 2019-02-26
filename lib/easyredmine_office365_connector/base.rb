@@ -106,6 +106,8 @@ module EasyredmineOfficeConnector
             puts "UPDATE: Contact(#{easy_contact}) for User(#{@user})"
             status = true
           else
+            # remove existing ID if update fails
+            easy_contact.o365_user_mapping(@user).destroy
             puts "UPDATE FAILED: Contact(#{easy_contact}) for User(#{@user})"
           end
         end
