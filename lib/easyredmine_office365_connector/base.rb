@@ -78,6 +78,7 @@ module EasyredmineOfficeConnector
       settings = if easy_contact.o365_id_for_user(@user).nil? # => create
         { url: "/me/contacts" , method: :post }
       else
+        puts "START: Contact(#{easy_contact}) for User(#{@user}) with id #{easy_contact.o365_id_for_user(@user)}"
         { url: "/me/contacts/#{easy_contact.o365_id_for_user(@user)}" , method: :patch }
       end
 

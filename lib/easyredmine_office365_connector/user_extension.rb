@@ -17,7 +17,7 @@ module EasyredmineOffice365Connector
     end
 
     def o365_api
-      @_o365_api ||= EasyredmineOfficeConnector::Api.new(self.office365_oauth_token, self)
+      EasyredmineOfficeConnector::Api.new(self.office365_oauth_token, self)
     end
 
   end
