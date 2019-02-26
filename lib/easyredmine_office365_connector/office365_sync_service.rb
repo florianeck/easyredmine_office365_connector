@@ -6,7 +6,8 @@ module EasyredmineOfficeConnector
     def initialize(pipeline_entry)
       @pipeline_entry = pipeline_entry
       @users = @pipeline_entry.get_users_for_sync
-
+      @pipeline_entry.synced_for_user_ids = []
+      @pipeline_entry.sync_failed_for_user_ids = []
       @api_action = case @pipeline_entry.entry.class.name
       when "EasyContact"
         :create_or_update_contact

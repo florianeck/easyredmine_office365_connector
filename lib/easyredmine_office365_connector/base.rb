@@ -84,13 +84,16 @@ module EasyredmineOfficeConnector
       status = false
 
       self.send(settings[:method], settings[:url], easy_contact.to_o365_hash) do |response|
+        puts "======"
         puts response.body
         if settings[:method] == :post # => create
           begin
             if JSON.parse(response.body)['id']
+              puts "CREATED: Contact(#{easy_contact}) for User(#{@user})"
               easy_contact.set_o365_id_for_user(@user, JSON.parse(response.body)['id'])
               status = true
             else
+              puts "CREATE FAILED: Contact(#{easy_contact}) for User(#{@user})"
               status = false
             end
           rescue Exception => e
@@ -99,9 +102,10 @@ module EasyredmineOfficeConnector
           end
         else
           if response.inspect.include?('200')
+            puts "UPDATE: Contact(#{easy_contact}) for User(#{@user})"
             status = true
           else
-            # binding.pry
+            puts "UPDATE FAILED: Contact(#{easy_contact}) for User(#{@user})"
           end
         end
       end
