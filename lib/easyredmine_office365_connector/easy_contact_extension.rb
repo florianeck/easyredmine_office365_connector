@@ -22,7 +22,7 @@ module EasyredmineOffice365Connector
     end
 
     def o365_user_mapping(user)
-      @_o365_user_mapping ||= Office365EasyContactsUserMapping.find_or_create_by(user_id: user.id, easy_contact_id: self.id)
+      Office365EasyContactsUserMapping.find_or_create_by(user_id: user.id, easy_contact_id: self.id)
     end
 
     def add_to_o365_sync_pipeline
