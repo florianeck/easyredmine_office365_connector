@@ -25,11 +25,11 @@ class O365ContactMapper
       "BusinessPhones" => [easy_contact.custom_field_value(EasyContacts::CustomFields.telephone_id)],
       "MobilePhone1" => nil, # => TODO: GET from custom fields
       "BusinessAddress" => {
-        "Street" => easy_contact.street,
-        "City" => easy_contact.city,
-        "State" => easy_contact.state,
+        "Street" => easy_contact.street.presence || parent_company.try(:street),
+        "City" => easy_contact.city.presence || parent_company.try(:city),
+        "State" => easy_contact.state.presence || parent_company.try(:state ),
         "CountryOrRegion" => nil,
-        "PostalCode" => nil
+        "PostalCode" => easy_contact.zip.presence || parent_company.try(:zip)
       },
       "PersonalNotes" => easy_contact.projects.map(&:name).join(" / "),
     }
@@ -42,5 +42,12 @@ class O365ContactMapper
       easy_contact.custom_field_value(EasyContacts::CustomFields.organization_id)
     end
   end
+
+  def parent_company
+    @_parent_company ||= if easy_contact.person? && easy_contact.parent && easy_contact.parent.company?
+      easy_contact.parent
+    end
+  end
+
 
 end

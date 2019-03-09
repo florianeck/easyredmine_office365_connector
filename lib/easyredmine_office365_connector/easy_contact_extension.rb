@@ -30,5 +30,10 @@ module EasyredmineOffice365Connector
       Office365SyncPipeline.create(entry: self)
     end
 
+    # extend quick getters
+    def zip
+      custom_field_value(CustomField.find_by(internal_name: 'easy_contacts_postal_code').id)
+    end
+
   end
 end
