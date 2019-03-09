@@ -5,9 +5,7 @@ module EasyredmineOfficeConnector
 
     def initialize(pipeline_entry)
       @pipeline_entry = pipeline_entry
-      @users = @pipeline_entry.get_users_for_sync
-      @pipeline_entry.synced_for_user_ids = []
-      @pipeline_entry.sync_failed_for_user_ids = []
+      @users = Array.wrap(@pipeline_entry.user || @pipeline_entry.get_users_for_sync)
       @api_action = case @pipeline_entry.entry.class.name
       when "EasyContact"
         :create_or_update_contact
@@ -16,18 +14,21 @@ module EasyredmineOfficeConnector
 
     def sync
       @users.each do |user|
+        user_pipeline_entry = Office365SyncPipeline.new(@pipeline_entry.attributes.merge(user_id: user.id, id: nil))
         begin
           if user.o365_api.send(api_action, pipeline_entry.entry)
-            @pipeline_entry.synced_for_user_ids << user.id
+            user_pipeline_entry.status = 'ok'
+            user_pipeline_entry.synced_at = Time.now
           else
-            @pipeline_entry.sync_failed_for_user_ids << user.id
+            user_pipeline_entry.status = 'fail'
           end
         rescue Exception => e
-          @pipeline_entry.sync_failed_for_user_ids << user.id
+          user_pipeline_entry.status = 'fail'
         end
+        user_pipeline_entry.save
       end
-      @pipeline_entry.synced_at = Time.now
-      @pipeline_entry.save
+
+      @pipeline_entry.destroy
     end
 
   end
