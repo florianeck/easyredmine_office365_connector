@@ -5,6 +5,7 @@ namespace :o365 do
     Office365SyncPipeline.unsynced.each do |p|
       EasyredmineOfficeConnector::Office365SyncService.new(p).sync
     end
+    EasyredmineOfficeConnector::Office365SyncService.cleanup_deleted_entries
   end
 
   desc "refresh all tokens for users with refresh token"

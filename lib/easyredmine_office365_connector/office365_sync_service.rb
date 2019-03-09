@@ -35,5 +35,13 @@ module EasyredmineOfficeConnector
       @pipeline_entry.destroy
     end
 
+
+    def self.cleanup_deleted_entries
+      Office365EasyContactsUserMapping.deleted_or_anonymized.each do |deleted_entry|
+        deleted_entry.user.o365_api.delete_contact(deleted_entry.office365_contact_id)
+        deleted_entry.destroy
+      end
+    end
+
   end
 end

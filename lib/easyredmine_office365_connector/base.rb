@@ -118,12 +118,8 @@ module EasyredmineOfficeConnector
       return status
     end
 
-    def delete_contact(easy_contact)
-      if easy_contact.o365_id_for_user(@user).nil? # => no settings
-        return false
-      else
-        self.delete("/me/contacts/#{easy_contact.o365_id_for_user(@user)}")
-      end
+    def delete_contact(contact_id)
+      self.send :delete, "/me/contacts/#{contact_id}"
     end
 
 

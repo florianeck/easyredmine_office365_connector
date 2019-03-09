@@ -6,4 +6,8 @@ class Office365EasyContactsUserMapping < ActiveRecord::Base
   validates_presence_of :user_id, :easy_contact_id
   validates_presence_of :easy_contact_id, scope: :user_id
 
+  scope :deleted_or_anonymized, -> {
+    joins("LEFT join easy_contacts ON #{self.table_name}.easy_contact_id = easy_contacts.id")
+    .where("easy_contacts.id IS NULL")
+  }
 end

@@ -36,7 +36,7 @@ class O365ContactMapper
   end
 
   def parent_company_name
-    if easy_contact.person? && easy_contact.parent.company?
+    if easy_contact.person? && easy_contact.parent && easy_contact.parent.company?
       easy_contact.parent.try(:name)
     elsif easy_contact.person?
       easy_contact.custom_field_value(EasyContacts::CustomFields.organization_id)
