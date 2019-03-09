@@ -5,6 +5,7 @@ module EasyredmineOffice365Connector
 
     included do
       after_save :add_to_o365_sync_pipeline
+      before_destroy :add_to_o365_sync_pipeline
     end
 
     def to_o365_hash

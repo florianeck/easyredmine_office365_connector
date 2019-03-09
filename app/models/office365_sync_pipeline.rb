@@ -16,8 +16,12 @@ class Office365SyncPipeline < ActiveRecord::Base
     users_for_sync = []
     case self.entry.class.name
     when "EasyContact"
-      self.entry.projects.each do |project|
-        users_for_sync << project.users.select {|u| u.office365_projects_enabled.include?(project) }
+      if self.entry.private?
+        users_for_sync << self.entry.author
+      else
+        self.entry.projects.each do |project|
+          users_for_sync << project.users.select {|u| u.office365_projects_enabled.include?(project) }
+        end
       end
     end
 
