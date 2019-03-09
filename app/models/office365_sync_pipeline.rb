@@ -25,7 +25,7 @@ class Office365SyncPipeline < ActiveRecord::Base
   end
 
   def cancel_if_pending_entry_exists!
-    if self.status == 'pending' && self.class.find_by(entry_id: self.entry.id, entry_type: self.entry.class_name, status: 'pending').present?
+    if self.status == 'pending' && self.class.find_by(entry_id: self.entry.id, entry_type: self.entry.class.name, status: 'pending').present?
       return false
     end
   end

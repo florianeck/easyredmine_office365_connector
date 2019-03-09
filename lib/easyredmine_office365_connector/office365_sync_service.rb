@@ -27,6 +27,7 @@ module EasyredmineOfficeConnector
         end
         user_pipeline_entry.save
       end
+
       @pipeline_entry.destroy
     end
 
