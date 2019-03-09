@@ -8,6 +8,6 @@ class Office365EasyContactsUserMapping < ActiveRecord::Base
 
   scope :deleted_or_anonymized, -> {
     joins("LEFT join easy_contacts ON #{self.table_name}.easy_contact_id = easy_contacts.id")
-    .where("easy_contacts.id IS NULL")
+    .where("easy_contacts.id IS NULL OR easy_contacts.firstname IN (#{I18n.available_locales.map {|e| I18n.t(:field_anonymized, locale: e) }.map {|e| "'#{e}'"}.join(",")})")
   }
 end
