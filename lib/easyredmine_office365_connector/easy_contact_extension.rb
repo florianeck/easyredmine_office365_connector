@@ -27,7 +27,9 @@ module EasyredmineOffice365Connector
     end
 
     def add_to_o365_sync_pipeline
-      Office365SyncPipeline.create(entry: self)
+      if Office365SyncPipeline.find_by(entry_type: 'EasyContact', entry_id: self.id, status: 'pending').nil?
+        Office365SyncPipeline.create(entry: self)
+      end
     end
 
     # extend quick getters
