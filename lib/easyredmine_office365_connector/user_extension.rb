@@ -4,8 +4,11 @@ module EasyredmineOffice365Connector
     extend ActiveSupport::Concern
 
     included do
-      safe_attributes :office365_oauth_token, :office365_project_ids_enabled, :office365_contact_sync_mode, :office365_always_sync_favorite
+      safe_attributes :office365_oauth_token, :office365_project_ids_enabled,
+        :office365_contact_sync_mode, :office365_always_sync_favorite, :office365_sync_contact_types
+
       serialize :office365_project_ids_enabled, Array
+      serialize :office365_sync_contact_types, Array
 
       def self.contact_sync_modes
         [
@@ -36,7 +39,8 @@ module EasyredmineOffice365Connector
     def o365_contact_sync_settings_changed?
       office365_project_ids_enabled_changed? ||
       office365_contact_sync_mode_changed? ||
-      office365_always_sync_favorite_changed?
+      office365_always_sync_favorite_changed? ||
+      office365_sync_contact_types_changed?
     end
 
     def setup_full_sync_if_settings_changed
