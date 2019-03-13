@@ -4,7 +4,8 @@ namespace :o365 do
   task :sync_contacts => :environment do
 
     if ENV['FULL_SYNC'] == 'true'
-      EasyContact.all.each(&:add_to_o365_sync_pipeline)
+      puts "RUNNING in Full Sync Mode!"
+      # EasyContact.all.each(&:add_to_o365_sync_pipeline)
     end
 
     Office365SyncPipeline.unsynced.each do |p|
