@@ -16,16 +16,26 @@ class Office365SyncPipeline < ActiveRecord::Base
     users_for_sync = []
     case self.entry.class.name
     when "EasyContact"
-      users_for_sync << self.entry.author
+      # Adding users that added contact as favorite
+      users_for_sync << self.entry.users.where(office365_always_sync_favorite: true)
 
-      unless self.entry.private?
-        self.entry.projects.each do |project|
-          users_for_sync << project.users.select {|u| u.office365_projects_enabled.include?(project) }
+      # Adding users that want to sync all contacts
+      users_for_sync << User.where(office365_contact_sync_mode: 'all_contacts')
+
+      self.entry.projects.each do |project|
+        users_for_sync << project.users.select do |u|
+          # adding users that only want to sync selected projects
+          if u.office365_contact_sync_mode == 'selected_projects'
+            u.office365_projects_enabled.include?(project)
+          # adding users that want to sync all contacts from projects
+          elsif u.office365_contact_sync_mode == 'all_projects'
+            true
+          end
         end
       end
     end
 
-    users_for_sync.flatten.uniq
+    users_for_sync.flatten.uniq.select(&:office365_active?)
   end
 
   def cancel_if_pending_entry_exists!

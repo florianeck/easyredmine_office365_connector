@@ -7,4 +7,9 @@ de:
     labels:
       no_user_id: kein Zugriffstoken vorhanden
       projects_enabled: Synchronisierung für folgende Projekte aktivieren
-
+      contact_sync_mode: Zu synchronisierende Kontakte
+      selected_projects: Nur gewählte Projekte
+      all_projects: Alle Projekte
+      all_contacts: Alle Kontakte
+      office365_always_sync_favorite: Favoriten immer synchronisieren
+      no_sync: keine
