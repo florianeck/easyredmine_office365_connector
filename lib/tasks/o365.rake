@@ -2,18 +2,26 @@ namespace :o365 do
 
   desc "Update Contacts on O365 Server"
   task :sync_contacts => :environment do
+    lockfile = "#{Rails.root}/tmp/osync.lock"
+    unless File.exists?(lockfile)
 
-    if ENV['FULL_SYNC'] == 'true'
-      puts "RUNNING in Full Sync Mode!"
-      EasyContact.all.each(&:add_to_o365_sync_pipeline)
+      File.open(lockfile, "wb") {|f| f.puts Time.now.to_i }
+
+      if ENV['FULL_SYNC'] == 'true'
+        puts "RUNNING in Full Sync Mode!"
+        EasyContact.all.each(&:add_to_o365_sync_pipeline)
+      end
+
+      begin
+        Parallel.each(Office365SyncPipeline.unsynced, in_threads: 4) do |p|
+          EasyredmineOfficeConnector::Office365SyncService.new(p).sync
+        end
+
+        EasyredmineOfficeConnector::Office365SyncService.cleanup_deleted_entries
+      ensure
+        FileUtils.rm(lockfile)
+      end
     end
-
-
-    Parallel.each(Office365SyncPipeline.unsynced, in_processes: 3) do |p|
-      EasyredmineOfficeConnector::Office365SyncService.new(p).sync
-    end
-
-    EasyredmineOfficeConnector::Office365SyncService.cleanup_deleted_entries
   end
 
   desc "refresh all tokens for users with refresh token"
