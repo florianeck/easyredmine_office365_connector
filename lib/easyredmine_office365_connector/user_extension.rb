@@ -44,7 +44,9 @@ module EasyredmineOffice365Connector
     end
 
     def setup_full_sync_if_settings_changed
-      EasyContact.all.each(&:add_to_o365_sync_pipeline)
+      if o365_contact_sync_settings_changed?
+        EasyContact.all.each(&:add_to_o365_sync_pipeline)
+      end
     end
 
   end

@@ -5,12 +5,14 @@ namespace :o365 do
 
     if ENV['FULL_SYNC'] == 'true'
       puts "RUNNING in Full Sync Mode!"
-      # EasyContact.all.each(&:add_to_o365_sync_pipeline)
+      EasyContact.all.each(&:add_to_o365_sync_pipeline)
     end
 
-    Office365SyncPipeline.unsynced.each do |p|
+
+    Parallel.each(Office365SyncPipeline.unsynced, in_processes: 3) do |p|
       EasyredmineOfficeConnector::Office365SyncService.new(p).sync
     end
+
     EasyredmineOfficeConnector::Office365SyncService.cleanup_deleted_entries
   end
 
