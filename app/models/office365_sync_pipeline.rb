@@ -17,7 +17,7 @@ class Office365SyncPipeline < ActiveRecord::Base
     case self.entry.class.name
     when "EasyContact"
       if self.entry.private?
-        users_for_sync << self.author
+        users_for_sync << self.entry.author
       else
         # Adding users that added contact as favorite
         users_for_sync << self.entry.users.where(office365_always_sync_favorite: true)
