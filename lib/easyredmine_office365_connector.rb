@@ -33,6 +33,20 @@ module EasyredmineOfficeConnector
     def redirect_url
       Rails.application.routes.url_helpers.o365_callback_url(host: config_from_yaml['redirect_host'])
     end
+
+    # Contact custom fields mapping
+    [:mobile, :title, :job_title, :country, :website, :department].each do |cf_name|
+      define_method "#{cf_name}_custom_field" do
+        if cf_id = config_from_yaml.dig('custom_field_ids', cf_name.to_s)
+          instance_variable_set("@_#{cf_name}_custom_field", CustomField.find(cf_id))
+        end
+      end
+
+      define_method "#{cf_name}_custom_field_id" do
+        config_from_yaml.dig('custom_field_ids', cf_name.to_s)
+      end
+    end
+
   end
 
 end

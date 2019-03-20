@@ -16,21 +16,25 @@ class Office365SyncPipeline < ActiveRecord::Base
     users_for_sync = []
     case self.entry.class.name
     when "EasyContact"
-      # Adding users that added contact as favorite
-      users_for_sync << self.entry.users.where(office365_always_sync_favorite: true)
+      if contact.private?
+        users_for_sync << self.author
+      else
+        # Adding users that added contact as favorite
+        users_for_sync << self.entry.users.where(office365_always_sync_favorite: true)
 
-      # Adding users that want to sync all contacts
-      users_for_sync << User.where(office365_contact_sync_mode: 'all_contacts').where("office365_sync_contact_types LIKE '%#{self.entry.type_id}%'")
+        # Adding users that want to sync all contacts
+        users_for_sync << User.where(office365_contact_sync_mode: 'all_contacts').where("office365_sync_contact_types LIKE '%#{self.entry.type_id}%'")
 
-      self.entry.projects.each do |project|
-        users_for_sync << project.users.select do |u|
-          next if !u.office365_sync_contact_types.include?(self.entry.type_id.to_s)
-          # adding users that only want to sync selected projects
-          if u.office365_contact_sync_mode == 'selected_projects'
-            u.office365_projects_enabled.include?(project)
-          # adding users that want to sync all contacts from projects
-          elsif u.office365_contact_sync_mode == 'all_projects'
-            true
+        self.entry.projects.each do |project|
+          users_for_sync << project.users.select do |u|
+            next if !u.office365_sync_contact_types.include?(self.entry.type_id.to_s)
+            # adding users that only want to sync selected projects
+            if u.office365_contact_sync_mode == 'selected_projects'
+              u.office365_projects_enabled.include?(project)
+            # adding users that want to sync all contacts from projects
+            elsif u.office365_contact_sync_mode == 'all_projects'
+              true
+            end
           end
         end
       end

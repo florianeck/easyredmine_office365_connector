@@ -11,24 +11,26 @@ class O365ContactMapper
       "DisplayName"   => easy_contact.name,
       "GivenName"     => easy_contact.person? ? easy_contact.firstname : nil,
       "Surname"       => easy_contact.person? ? easy_contact.lastname : nil,
-      "Title" => nil, # => TODO: GET from custom fields
+      "Title" => easy_contact.custom_field_value(EasyredmineOfficeConnector.title_custom_field_id),
       "EmailAddresses" => [
         (easy_contact.email.present? ? {"address" => easy_contact.email, "name" => easy_contact.name } : nil)
       ].compact,
-      "JobTitle" => nil, # => TODO: GET from custom fields
-      "CompanyName" => easy_contact.person? ? parent_company_name : easy_contact.name,
-      #"Department" => null,
+      "JobTitle" => easy_contact.custom_field_value(EasyredmineOfficeConnector.job_title_custom_field_id),
+      "CompanyName" => (easy_contact.person? ? parent_company_name : easy_contact.name),
+      "Department" => easy_contact.custom_field_value(EasyredmineOfficeConnector.department_custom_field_id),
       #"OfficeLocation" => null,
       #"Profession" => null,
-      #"BusinessHomePage" => null,
+      "BusinessHomePage" => parent_company.try(:custom_field_value, EasyredmineOfficeConnector.website_custom_field_id),
       #"Manager" => null,
-      "BusinessPhones" => [easy_contact.custom_field_value(EasyContacts::CustomFields.telephone_id)],
-      "MobilePhone1" => nil, # => TODO: GET from custom fields
+      "BusinessPhones" => [easy_contact.custom_field_value(EasyContacts::CustomFields.telephone_id)].compact,
+      "MobilePhone1" => [
+        easy_contact.custom_field_value(EasyredmineOfficeConnector.mobile_custom_field_id)
+      ].compact,
       "BusinessAddress" => {
         "Street" => easy_contact.street.presence || parent_company.try(:street),
         "City" => easy_contact.city.presence || parent_company.try(:city),
         "State" => easy_contact.state.presence || parent_company.try(:state ),
-        "CountryOrRegion" => nil,
+        "CountryOrRegion" => easy_contact.custom_field_value(EasyredmineOfficeConnector.country_custom_field_id),
         "PostalCode" => easy_contact.zip.presence || parent_company.try(:zip)
       },
       "PersonalNotes" => easy_contact.projects.map(&:name).join(" / "),
