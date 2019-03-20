@@ -23,9 +23,7 @@ class O365ContactMapper
       "BusinessHomePage" => parent_company.try(:custom_field_value, EasyredmineOfficeConnector.website_custom_field_id),
       #"Manager" => null,
       "BusinessPhones" => [easy_contact.custom_field_value(EasyContacts::CustomFields.telephone_id)].compact,
-      "MobilePhone1" => [
-        easy_contact.custom_field_value(EasyredmineOfficeConnector.mobile_custom_field_id)
-      ].compact,
+      "MobilePhone1" => easy_contact.custom_field_value(EasyredmineOfficeConnector.mobile_custom_field_id),
       "BusinessAddress" => {
         "Street" => easy_contact.street.presence || parent_company.try(:street),
         "City" => easy_contact.city.presence || parent_company.try(:city),
